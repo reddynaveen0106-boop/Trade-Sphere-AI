@@ -1,21 +1,17 @@
 from fastapi import FastAPI
 
+from app.api.country import router as country_router
+
 app = FastAPI(
-    title="TradeSphere AI API",
-    description="Backend API for TradeSphere AI",
+    title="Trade Sphere AI",
     version="1.0.0"
 )
 
+app.include_router(country_router)
+
 
 @app.get("/")
-def root():
+def home():
     return {
-        "message": "Welcome to TradeSphere AI Backend 🚀"
-    }
-
-
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
+        "message": "Welcome to Trade Sphere AI API 🚀"
     }
