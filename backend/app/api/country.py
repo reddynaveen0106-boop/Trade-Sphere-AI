@@ -25,11 +25,9 @@ def add_country(country: CountryCreate, db: Session = Depends(get_db)):
 
 
 # Get All Countries
-@router.get("/countries")
+@router.get("/countries", response_model=list[CountryResponse])
 def read_countries(db: Session = Depends(get_db)):
-    countries = get_countries(db)
-    print(countries)
-    return countries
+    return get_countries(db)
 
 # Get Country by ID
 @router.get("/countries/{country_id}", response_model=CountryResponse)

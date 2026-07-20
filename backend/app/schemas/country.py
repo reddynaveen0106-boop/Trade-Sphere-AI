@@ -1,19 +1,29 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 
 class CountryBase(BaseModel):
     name: str
-    code: str
-    flag: str
+    code: Optional[str] = None
+    flag: Optional[str] = None
     capital: str
     currency: str
     population: int
-    gdp: str
-    imports: str
-    exports: str
-    top_commodity: str
-    risk_level: str
-    trade_rank: int
+    gdp: Optional[str] = None
+    imports: Optional[str] = None
+    exports: Optional[str] = None
+    top_commodity: Optional[str] = None
+    risk_level: Optional[str] = None
+    trade_rank: Optional[int] = None
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        alias_generator=lambda field: "".join(
+            word.capitalize() if i else word
+            for i, word in enumerate(field.split("_"))
+        )
+    )
 
 
 class CountryCreate(CountryBase):
@@ -26,6 +36,3 @@ class CountryUpdate(CountryBase):
 
 class CountryResponse(CountryBase):
     id: int
-
-    class Config:
-        from_attributes = True
