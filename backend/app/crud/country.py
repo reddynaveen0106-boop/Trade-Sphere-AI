@@ -38,6 +38,15 @@ def get_country_by_id(db: Session, country_id: int):
     return db.query(Country).filter(Country.id == country_id).first()
 
 
+# Get Country by Code
+def get_country_by_code(db: Session, country_code: str):
+    return (
+        db.query(Country)
+        .filter(Country.code == country_code.upper())
+        .first()
+    )
+
+
 # Update Country
 def update_country(db: Session, country_id: int, country: CountryUpdate):
     db_country = db.query(Country).filter(Country.id == country_id).first()

@@ -11,6 +11,7 @@ from app.crud.country import (
     create_country,
     get_countries,
     get_country_by_id,
+    get_country_by_code,
     update_country,
     delete_country,
 )
@@ -29,10 +30,28 @@ def add_country(country: CountryCreate, db: Session = Depends(get_db)):
 def read_countries(db: Session = Depends(get_db)):
     return get_countries(db)
 
+
 # Get Country by ID
 @router.get("/countries/{country_id}", response_model=CountryResponse)
 def read_country(country_id: int, db: Session = Depends(get_db)):
     country = get_country_by_id(db, country_id)
+
+    if country is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Country not found"
+        )
+
+    return country
+
+
+# Get Country by Code
+@router.get("/countries/code/{country_code}", response_model=CountryResponse)
+def read_country_by_code(
+    country_code: str,
+    db: Session = Depends(get_db),
+):
+    country = get_country_by_code(db, country_code)
 
     if country is None:
         raise HTTPException(
