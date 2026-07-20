@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Globe2, ArrowUpRight, TrendingUp, TrendingDown, Award } from 'lucide-react';
-import { COUNTRIES_DB } from '../data/countries';
+import { getCountries } from '../services/api';
 
 export default function Countries() {
+
+  const [countries, setCountries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -14,14 +18,29 @@ export default function Countries() {
     const params = new URLSearchParams(location.search);
     const focusId = params.get('focus');
     if (focusId) {
-      const match = COUNTRIES_DB.find(c => c.id === focusId);
+      const match = countries.find(c => c.id === focusId);
       if (match) {
         setSearch(match.name);
       }
     }
-  }, [location.search]);
+  }, [location.search, countries]);
 
-  const filtered = COUNTRIES_DB.filter(c =>
+  useEffect(() => {
+  async function loadCountries() {
+    try {
+      const data = await getCountries();
+      setCountries(data);
+    } catch (error) {
+      console.error("Failed to load countries:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  loadCountries();
+}, []);
+
+  const filtered = countries.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.topCommodity.toLowerCase().includes(search.toLowerCase()) ||
     c.code.toLowerCase().includes(search.toLowerCase())
@@ -46,7 +65,7 @@ export default function Countries() {
             Countries & Trade Database
           </h1>
           <p style={{ color: '#94a3b8', fontSize: '1rem' }}>
-            Explore bilateral trade metrics, nominal GDP, and AI-powered intelligence reports for {COUNTRIES_DB.length} economies.
+            Explore bilateral trade metrics, nominal GDP, and AI-powered intelligence reports for {countries.length} economies.
           </p>
         </motion.div>
 
