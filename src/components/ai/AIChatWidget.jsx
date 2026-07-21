@@ -78,24 +78,59 @@ export default function AIChatWidget({ forceOpen = false, onClose }) {
     setInput('');
     setLoading(true);
 
-    // Simulate AI thinking delay
-    await new Promise(r => setTimeout(r, 1000 + Math.random() * 600));
+    try {
+  const response = await fetch("http://127.0.0.1:8000/ai/query", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      question: msg,
+    }),
+  });
 
-    setMessages(prev => [...prev, {
+  if (!response.ok) {
+    throw new Error("Backend request failed");
+  }
+
+  const data = await response.json();
+
+  setMessages(prev => [
+    ...prev,
+    {
       id: Date.now() + 1,
-      role: 'assistant',
-      content: getMockResponse(msg),
+      role: "assistant",
+      content: data.answer,
       timestamp: new Date(),
-    }]);
-    setLoading(false);
+    },
+  ]);
+
+} catch (error) {
+  console.error("FULL ERROR:", error);
+
+  setMessages(prev => [
+    ...prev,
+    {
+      id: Date.now() + 1,
+      role: "assistant",
+      content: `❌ ${error.message}`,
+      timestamp: new Date(),
+    },
+  ]);
+  
+} finally {
+  setLoading(false);
+}
+
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+
+const handleKeyDown = (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+};
 
   return (
     <>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Send, Zap, User } from 'lucide-react';
-import { AI_QUICK_QUESTIONS, AI_MOCK_RESPONSES } from '../data/mockData';
+import { AI_QUICK_QUESTIONS } from '../data/mockData';
 
 const INITIAL_MESSAGES = [
   {
@@ -25,11 +25,6 @@ function parseMarkdown(text) {
     .replace(/\n/g, '<br/>');
 }
 
-function getMockResponse(q) {
-  const ql = q.toLowerCase();
-  if (ql.includes('rice')) return AI_MOCK_RESPONSES.rice;
-  return AI_MOCK_RESPONSES.default;
-}
 
 export default function AIAssistant() {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
@@ -42,16 +37,65 @@ export default function AIAssistant() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const send = async (text) => {
-    const msg = text || input.trim();
-    if (!msg) return;
-    setMessages(p => [...p, { id: Date.now(), role: 'user', content: msg }]);
-    setInput('');
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1000 + Math.random() * 1000));
-    setMessages(p => [...p, { id: Date.now() + 1, role: 'assistant', content: getMockResponse(msg) }]);
+ const send = async (text) => {
+  const msg = text || input.trim();
+
+  if (!msg) return;
+
+  setMessages((p) => [
+    ...p,
+    {
+      id: Date.now(),
+      role: "user",
+      content: msg,
+    },
+  ]);
+
+  setInput("");
+  setLoading(true);
+
+try {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const response = await fetch(`${API_URL}/ai/query`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      question: msg,
+    }),
+  });
+
+    if (!response.ok) {
+      throw new Error("Backend request failed");
+    }
+
+    const data = await response.json();
+
+    setMessages((p) => [
+      ...p,
+      {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: data.answer,
+      },
+    ]);
+  } catch (error) {
+    console.error(error);
+
+    setMessages((p) => [
+      ...p,
+      {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: "⚠️ Unable to connect to TradeSphere AI backend.",
+      },
+    ]);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div style={{ paddingTop: 68, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
