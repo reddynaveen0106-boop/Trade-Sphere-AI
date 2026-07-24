@@ -15,9 +15,9 @@ engine = create_engine(DATABASE_URL)
 # Test connection
 try:
     with engine.connect() as connection:
-        print("✅ Successfully connected to PostgreSQL!")
+        print("Successfully connected to PostgreSQL!")
 except Exception as e:
-    print("❌ Connection failed:")
+    print("Connection failed:")
     print(e)
 
 # Session factory

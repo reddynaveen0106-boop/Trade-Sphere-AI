@@ -89,7 +89,7 @@ try {
       {
         id: Date.now() + 1,
         role: "assistant",
-        content: "⚠️ Unable to connect to TradeSphere AI backend.",
+        content: "⚠️ Unable to connect to ProFinFly AI backend.",
       },
     ]);
   } finally {

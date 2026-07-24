@@ -130,7 +130,7 @@ export default function Navbar() {
                 lineHeight: 1,
                 letterSpacing: '-0.03em'
               }}>
-                TradeSphere <span style={{ color: '#06b6d4' }}>AI</span>
+                ProFinFly <span style={{ color: '#06b6d4' }}>AI</span>
               </span>
               <span style={{
                 fontSize: '10px',
